@@ -2,18 +2,26 @@ import {
   Select,
   CheckboxesWrapper,
   Label,
-  Check,
+  Input,
   CheckIcon,
   CheckText,
 } from "./CustomSelect.styled";
 import { useState } from "react";
 import selectIcon from "../../assets/select-icon.svg";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { setNodes } from "../../redux/nodesSlice";
+import { setNodes, setChecked, removeChecked } from "../../redux/nodesSlice";
 import { selectData } from "../../redux/selectors";
 import { CustomSelectProps } from "../../helpers/types";
+import { useEffect } from "react";
 
-const checkboxArray = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }, { id: 6 }];
+const checkboxArray = [
+  { option: "1" },
+  { option: "2" },
+  { option: "3" },
+  { option: "4" },
+  { option: "5" },
+  { option: "6" },
+];
 
 export const CustomSelect = ({
   isSelectOpen,
@@ -22,8 +30,24 @@ export const CustomSelect = ({
   nodeName,
 }: CustomSelectProps) => {
   const dispatch = useAppDispatch();
-  const { nodes } = useAppSelector(selectData);
-  const [checkBoxValues, setCheckBoxValues] = useState<string[]>([]);
+  const { nodes, checked } = useAppSelector(selectData);
+  const [checkedInputs, setCheckedInputs] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log("nodeNumb", nodeNumb);
+    console.log("checked", checked);
+    console.log("nodes", nodes);
+  }, [checked, nodeNumb, nodes]);
+
+  useEffect(() => {
+    if (checked.length > 0) {
+      checked.map((obj) => {
+        if (obj.id === nodeNumb) {
+          setCheckedInputs(obj.values);
+        }
+      });
+    }
+  }, [checked, nodeNumb]);
 
   const handleOpen = () => {
     setIsSelectOpen(!isSelectOpen);
@@ -37,15 +61,21 @@ export const CustomSelect = ({
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    const payload = { id: nodeNumb, value: inputValue };
+    const nodesPayload = {
+      childNode: inputValue,
+      parentNode: nodeNumb,
+      oldName: nodeName,
+    };
 
-    if (checkBoxValues.includes(inputValue)) {
-      setCheckBoxValues(checkBoxValues.filter((value) => value !== inputValue));
+    if (checkedInputs.includes(inputValue)) {
+      dispatch(removeChecked(payload));
+      // dispatch(removeNodes(nodesPayload));
     } else {
-      setCheckBoxValues([...checkBoxValues, inputValue]);
-      dispatch(
-        setNodes({ childNode: inputValue, parentNode: nodeNumb, oldName: nodeName })
-      );
+      dispatch(setChecked(payload));
+      dispatch(setNodes(nodesPayload));
     }
+
     setIsSelectOpen(false);
   };
 
@@ -65,19 +95,21 @@ export const CustomSelect = ({
       </Select>
       {isSelectOpen && (
         <CheckboxesWrapper role="group" aria-labelledby="my-checkbox-group">
-          {checkboxArray.map(({ id }) => (
-            <Label key={id}>
-              <Check
-                checked={checkBoxValues.includes(String(id))}
-                onChange={onChange}
-                name="position"
-                type="checkbox"
-                value={id}
-              />
-              <CheckIcon className="check_icon" />
-              <CheckText>Варіант {id}</CheckText>
-            </Label>
-          ))}
+          {checkboxArray.map(({ option }) => {
+            return (
+              <Label key={option}>
+                <Input
+                  checked={checkedInputs.includes(option)}
+                  onChange={onChange}
+                  name="position"
+                  type="checkbox"
+                  value={option}
+                />
+                <CheckIcon className="check_icon" />
+                <CheckText>Варіант {option}</CheckText>
+              </Label>
+            );
+          })}
         </CheckboxesWrapper>
       )}
     </>

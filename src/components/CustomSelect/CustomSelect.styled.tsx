@@ -51,7 +51,7 @@ export const Label = styled.label`
   border-bottom: 1px solid ${(props) => props.theme.colors.lightBlue};
 `;
 
-export const Check = styled.input`
+export const Input = styled.input`
   position: absolute;
   appearance: none;
   -webkit-appearance: none;

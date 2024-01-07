@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Node, Edge } from "reactflow";
 import { NodesState } from "../helpers/types";
 
@@ -12,13 +12,6 @@ const initialNodes: Node[] = [
 ];
 
 const initialEdges: Edge[] = [];
-
-const initialState = {
-  data: {
-    nodes: initialNodes,
-    edges: initialEdges,
-  },
-} as NodesState;
 
 const addNode = (object: Node, childNode: string, oldName: string) => {
   const newNode = {
@@ -42,11 +35,22 @@ const addEdge = (object: Node, childNode: string, parentNode: string) => {
   return newEdge;
 };
 
+const initialState = {
+  data: {
+    nodes: initialNodes,
+    edges: initialEdges,
+    checked: [],
+  },
+} as NodesState;
+
 const nodesSlice = createSlice({
   name: "nodes",
   initialState,
   reducers: {
-    setNodes: (state, action) => {
+    setNodes: (
+      state,
+      action: PayloadAction<{ childNode: string; parentNode: string; oldName: string }>
+    ) => {
       const { childNode, parentNode, oldName } = action.payload;
       const nodes = state.data.nodes;
 
@@ -59,8 +63,40 @@ const nodesSlice = createSlice({
         addEdge(nodes[nodes.length - 1], childNode, parentNode),
       ];
     },
+    removeNodes: () => {
+      // const { oldName } = action.payload;
+      // removing nodes
+      // const nodeIndex = state.data.nodes.findIndex(
+      //   (obj) => obj.data.nodeName === oldName
+      // );
+      // state.data.nodes = state.data.nodes.slice(nodeIndex, 1);
+      // removing edges
+      // const edgeIndex = state.data.edges.findIndex((obj) => obj.id === oldName);
+      // state.data.nodes = state.data.nodes.slice(edgeIndex, 1);
+    },
+    setChecked: (state, action: PayloadAction<{ id: string; value: string }>) => {
+      const { id, value } = action.payload;
+      const objIndex = state.data.checked.findIndex((obj) => obj.id === id);
+
+      if (objIndex === -1) {
+        state.data.checked = [...state.data.checked, { id, values: [value] }];
+      } else {
+        state.data.checked[objIndex].values = [
+          ...state.data.checked[objIndex].values,
+          ...[value],
+        ];
+      }
+    },
+    removeChecked: (state, action: PayloadAction<{ id: string; value: string }>) => {
+      const { id, value } = action.payload;
+
+      const objIndex = state.data.checked.findIndex((obj) => obj.id === id);
+      state.data.checked[objIndex].values = state.data.checked[objIndex].values.filter(
+        (val) => val !== value
+      );
+    },
   },
 });
 
-export const { setNodes } = nodesSlice.actions;
+export const { setNodes, setChecked, removeChecked, removeNodes } = nodesSlice.actions;
 export const nodesReducer = nodesSlice.reducer;
