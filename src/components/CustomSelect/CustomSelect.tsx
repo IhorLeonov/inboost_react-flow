@@ -26,28 +26,30 @@ const checkboxArray = [
 export const CustomSelect = ({
   isSelectOpen,
   setIsSelectOpen,
-  nodeNumb,
+  nodeId,
   nodeName,
 }: CustomSelectProps) => {
   const dispatch = useAppDispatch();
   const { nodes, checked } = useAppSelector(selectData);
   const [checkedInputs, setCheckedInputs] = useState<string[]>([]);
 
-  useEffect(() => {
-    console.log("nodeNumb", nodeNumb);
-    console.log("checked", checked);
-    console.log("nodes", nodes);
-  }, [checked, nodeNumb, nodes]);
+  // useEffect(() => {
+  //   console.log("nodeId", nodeId);
+  //   console.log("nodeName", nodeName);
+
+  //   // console.log("checked", checked);
+  //   console.log("nodes", nodes);
+  // }, [checked, nodeId, nodes, nodeName]);
 
   useEffect(() => {
     if (checked.length > 0) {
       checked.map((obj) => {
-        if (obj.id === nodeNumb) {
+        if (obj.id === nodeId) {
           setCheckedInputs(obj.values);
         }
       });
     }
-  }, [checked, nodeNumb]);
+  }, [checked, nodeId]);
 
   const handleOpen = () => {
     setIsSelectOpen(!isSelectOpen);
@@ -61,11 +63,11 @@ export const CustomSelect = ({
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const payload = { id: nodeNumb, value: inputValue };
+    const payload = { id: nodeId, value: inputValue };
     const nodesPayload = {
-      childNode: inputValue,
-      parentNode: nodeNumb,
-      oldName: nodeName,
+      selectedValue: inputValue,
+      prevNodeId: nodeId,
+      prevName: nodeName,
     };
 
     if (checkedInputs.includes(inputValue)) {

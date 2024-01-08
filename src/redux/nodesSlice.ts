@@ -1,35 +1,35 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Node, Edge } from "reactflow";
-import { NodesState } from "../helpers/types";
+import { Edge } from "reactflow";
+import { NodesState, CustomNode } from "../helpers/types";
 
-const initialNodes: Node[] = [
+const initialNodes: CustomNode[] = [
   {
     id: "1",
     type: "customNode",
     position: { x: 0, y: 0 },
-    data: { nodeNumb: "1", nodeName: "1" },
+    data: { nodeId: "1", nodeName: "1" },
   },
 ];
 
 const initialEdges: Edge[] = [];
 
-const addNode = (object: Node, childNode: string, oldName: string) => {
+const addNode = (object: CustomNode, selectedValue: string, prevName: string) => {
   const newNode = {
     id: `${Number(object.id) + 1}`,
     type: "customNode",
     position: { x: object.position.x + 250, y: object.position.y + 200 },
     data: {
-      nodeNumb: `${Number(object.id) + 1}`,
-      nodeName: `${oldName}-${childNode}`,
+      nodeId: `${Number(object.id) + 1}`,
+      nodeName: `${prevName}-${selectedValue}`,
     },
   };
   return newNode;
 };
 
-const addEdge = (object: Node, childNode: string, parentNode: string) => {
+const addEdge = (object: CustomNode, selectedValue: string, prevNodeId: string) => {
   const newEdge = {
-    id: `${parentNode}-${childNode}`,
-    source: `${parentNode}`,
+    id: `${prevNodeId}-${selectedValue}`,
+    source: `${prevNodeId}`,
     target: `${Number(object.id) + 1}`,
   };
   return newEdge;
@@ -49,29 +49,33 @@ const nodesSlice = createSlice({
   reducers: {
     setNodes: (
       state,
-      action: PayloadAction<{ childNode: string; parentNode: string; oldName: string }>
+      action: PayloadAction<{
+        selectedValue: string;
+        prevNodeId: string;
+        prevName: string;
+      }>
     ) => {
-      const { childNode, parentNode, oldName } = action.payload;
+      const { selectedValue, prevNodeId, prevName } = action.payload;
       const nodes = state.data.nodes;
 
       state.data.nodes = [
         ...state.data.nodes,
-        addNode(nodes[nodes.length - 1], childNode, oldName),
+        addNode(nodes[nodes.length - 1], selectedValue, prevName),
       ];
       state.data.edges = [
         ...state.data.edges,
-        addEdge(nodes[nodes.length - 1], childNode, parentNode),
+        addEdge(nodes[nodes.length - 1], selectedValue, prevNodeId),
       ];
     },
     removeNodes: () => {
-      // const { oldName } = action.payload;
+      // const { prevName } = action.payload;
       // removing nodes
       // const nodeIndex = state.data.nodes.findIndex(
-      //   (obj) => obj.data.nodeName === oldName
+      //   (obj) => obj.data.nodeName === prevName
       // );
       // state.data.nodes = state.data.nodes.slice(nodeIndex, 1);
       // removing edges
-      // const edgeIndex = state.data.edges.findIndex((obj) => obj.id === oldName);
+      // const edgeIndex = state.data.edges.findIndex((obj) => obj.id === prevName);
       // state.data.nodes = state.data.nodes.slice(edgeIndex, 1);
     },
     setChecked: (state, action: PayloadAction<{ id: string; value: string }>) => {

@@ -17,19 +17,18 @@ export function CustomNode({ data, isConnectable }: NodeProps<NodeData>) {
       />
       <Area />
       <CustomSelect
-        nodeNumb={data.nodeNumb}
+        nodeId={data.nodeId}
         nodeName={data.nodeName}
         isSelectOpen={isSelectOpen}
         setIsSelectOpen={setIsSelectOpen}
       />
       <Handle
         type="source"
-        position={data.nodeNumb === "1" ? Position.Bottom : Position.Right}
+        position={data.nodeId === "1" ? Position.Bottom : Position.Right}
         id="a"
         isConnectable={isConnectable}
         style={{
           background: isSelectOpen ? "transparent" : "#adb5bd",
-          // display: Number(data.nodeNumb) === 1 ? "none" : "block",
         }}
       />
     </Node>

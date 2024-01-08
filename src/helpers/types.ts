@@ -1,6 +1,10 @@
 import { Node, Edge } from "reactflow";
 import { Dispatch, SetStateAction } from "react";
 
+export interface CustomNode extends Node {
+  data: { nodeId: string; nodeName: string };
+}
+
 interface CheckedVariant {
   id: string;
   values: string[];
@@ -8,7 +12,7 @@ interface CheckedVariant {
 
 export interface NodesState {
   data: {
-    nodes: Node[];
+    nodes: CustomNode[];
     edges: Edge[];
     checked: CheckedVariant[];
   };
@@ -17,11 +21,11 @@ export interface NodesState {
 export interface CustomSelectProps {
   isSelectOpen: boolean;
   setIsSelectOpen: Dispatch<SetStateAction<boolean>>;
-  nodeNumb: string;
+  nodeId: string;
   nodeName: string;
 }
 
 export type NodeData = {
-  nodeNumb: string;
+  nodeId: string;
   nodeName: string;
 };
